@@ -41,5 +41,14 @@ sequenceDiagram
 
 ## Development Plan
 
-- Create the scaffold of the Agent flow, stubbing out each of the components
+- Create the scaffold of the Agent loop, stubbing out each of the components
+
+State Machine
+The Agent works in a State Machine model in that we have States and Transition between states. 
+
+State -> Transition
+- Initalised -> Searching -> Resources Collected
+- Resources Collected -> Evaluating -> Resources Evaluated
+- Resource Evaluated -> Storing Metadata -> Resources Metadata Stored
+- Resources Metadata Stored -> Parsing Resource -> Resource Parsed
 

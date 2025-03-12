@@ -1,9 +1,28 @@
-import structlog
 import asyncio
 import functools
 import signal
+import enum
+
+import structlog
 
 logger = structlog.get_logger()
+
+
+class State(enum.Enum):
+    INIT = 1
+    COLLECTED = 2
+    EVALUATED = 3
+    METADATA_STORED = 4
+    RESOURCE_PARSED = 5
+    RESOURCE_STORED = 6
+
+
+class Transition(enum.Enum):
+    SEARCHING = 1
+    EVALUATING = 2
+    STORING_METADATA = 3
+    PARSING = 4
+    STORING_RESOURCE = 5
 
 
 class Agent:
@@ -28,9 +47,46 @@ class Agent:
 
         logger.info("Beginning agent loop")
         logger.info(f"Prompt: {self.prompt}")
+        # State Machine Loop
+        state = State.INIT
         while True:
-            await asyncio.sleep(5)
-            logger.info("Looping")
+            match state:
+                case State.INIT:
+                    new_state = State.COLLECTED
+                    transition = Transition.SEARCHING
+                    logger.info(f"Transitioning to {new_state} through {transition}")
+                    await asyncio.sleep(5)
+                    state = new_state
+                case State.COLLECTED:
+                    new_state = State.EVALUATED
+                    transition = Transition.EVALUATING
+                    logger.info(f"Transitioning to {new_state} through {transition}")
+                    await asyncio.sleep(5)
+                    state = new_state
+                case State.EVALUATED:
+                    new_state = State.METADATA_STORED
+                    transition = Transition.STORING_METADATA
+                    logger.info(f"Transitioning to {new_state} through {transition}")
+                    await asyncio.sleep(5)
+                    state = new_state
+                case State.METADATA_STORED:
+                    new_state = State.RESOURCE_PARSED
+                    transition = Transition.PARSING
+                    logger.info(f"Transitioning to {new_state} through {transition}")
+                    await asyncio.sleep(5)
+                    state = new_state
+                case State.RESOURCE_PARSED:
+                    new_state = State.RESOURCE_STORED
+                    transition = Transition.STORING_RESOURCE
+                    logger.info(f"Transitioning to {new_state} through {transition}")
+                    await asyncio.sleep(5)
+                    state = new_state
+                case State.RESOURCE_STORED:
+                    new_state = State.COLLECTED
+                    transition = Transition.SEARCHING
+                    logger.info(f"Transitioning to {new_state} through {transition}")
+                    await asyncio.sleep(5)
+                    state = new_state
 
     def stop(self, signame, loop):
         logger.info("Stoping agent")
