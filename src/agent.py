@@ -1,3 +1,8 @@
+from search import Search
+from structlog.contextvars import (
+    bind_contextvars,
+)
+
 import asyncio
 import functools
 import signal
@@ -32,6 +37,7 @@ class Agent:
 
     def __init__(self, prompt: str):
         self.prompt = prompt
+        self.search = Search()
 
     async def run(self):
         """
@@ -54,36 +60,44 @@ class Agent:
                 case State.INIT:
                     new_state = State.COLLECTED
                     transition = Transition.SEARCHING
+                    bind_contextvars(transition=transition.name, state=state.name)
                     logger.info(f"Transitioning to {new_state} through {transition}")
-                    await asyncio.sleep(5)
+
+                    self.results = await self.search.run(self.prompt)
+
                     state = new_state
                 case State.COLLECTED:
                     new_state = State.EVALUATED
                     transition = Transition.EVALUATING
+                    bind_contextvars(transition=transition.name, state=state.name)
                     logger.info(f"Transitioning to {new_state} through {transition}")
                     await asyncio.sleep(5)
                     state = new_state
                 case State.EVALUATED:
                     new_state = State.METADATA_STORED
                     transition = Transition.STORING_METADATA
+                    bind_contextvars(transition=transition.name, state=state.name)
                     logger.info(f"Transitioning to {new_state} through {transition}")
                     await asyncio.sleep(5)
                     state = new_state
                 case State.METADATA_STORED:
                     new_state = State.RESOURCE_PARSED
                     transition = Transition.PARSING
+                    bind_contextvars(transition=transition.name, state=state.name)
                     logger.info(f"Transitioning to {new_state} through {transition}")
                     await asyncio.sleep(5)
                     state = new_state
                 case State.RESOURCE_PARSED:
                     new_state = State.RESOURCE_STORED
                     transition = Transition.STORING_RESOURCE
+                    bind_contextvars(transition=transition.name, state=state.name)
                     logger.info(f"Transitioning to {new_state} through {transition}")
                     await asyncio.sleep(5)
                     state = new_state
                 case State.RESOURCE_STORED:
                     new_state = State.COLLECTED
                     transition = Transition.SEARCHING
+                    bind_contextvars(transition=transition.name, state=state.name)
                     logger.info(f"Transitioning to {new_state} through {transition}")
                     await asyncio.sleep(5)
                     state = new_state
@@ -91,3 +105,4 @@ class Agent:
     def stop(self, signame, loop):
         logger.info("Stoping agent")
         loop.stop()
+
