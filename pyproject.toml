@@ -9,7 +9,8 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "pydantic (>=2.10.6,<3.0.0)",
-    "structlog (>=25.2.0,<26.0.0)"
+    "structlog (>=25.2.0,<26.0.0)",
+    "arxiv-mcp-server (>=0.2.8,<0.3.0)"
 ]
 
 [tool.poetry]
