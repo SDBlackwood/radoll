@@ -1,4 +1,5 @@
-from search import Search
+from search import Arxiv
+from database import DB
 from structlog.contextvars import (
     bind_contextvars,
 )
@@ -37,7 +38,8 @@ class Agent:
 
     def __init__(self, prompt: str):
         self.prompt = prompt
-        self.search = Search()
+        self.search = Arxiv()
+        self.db = DB()
 
     async def run(self):
         """
@@ -71,21 +73,35 @@ class Agent:
                     transition = Transition.EVALUATING
                     bind_contextvars(transition=transition.name, state=state.name)
                     logger.info(f"Transitioning to {new_state} through {transition}")
-                    await asyncio.sleep(5)
+
+                    # TODO: Check if we already have these resources
+                    
+
+                    # TODO: Determine if these are suitable resources (based on what?)
+
                     state = new_state
+
                 case State.EVALUATED:
                     new_state = State.METADATA_STORED
                     transition = Transition.STORING_METADATA
                     bind_contextvars(transition=transition.name, state=state.name)
                     logger.info(f"Transitioning to {new_state} through {transition}")
-                    await asyncio.sleep(5)
+
+                    # Store metadata and download
+                    id_list = []
+                    for paper in self.results:
+                        id_list.append(paper["id"])
+                        self.db.store_metadata(paper)
+
                     state = new_state
                 case State.METADATA_STORED:
                     new_state = State.RESOURCE_PARSED
                     transition = Transition.PARSING
                     bind_contextvars(transition=transition.name, state=state.name)
                     logger.info(f"Transitioning to {new_state} through {transition}")
-                    await asyncio.sleep(5)
+                    #
+                    # Download the documents
+                    self.search.download(id_list)
                     state = new_state
                 case State.RESOURCE_PARSED:
                     new_state = State.RESOURCE_STORED

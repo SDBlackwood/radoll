@@ -6,7 +6,7 @@ logger = get_logger()
 client = arxiv.Client()
 
 
-class Search:
+class Arxiv:
     async def run(self, prompt: str):
         # Search for the 10 most recent articles matching the prompt
         search = arxiv.Search(
@@ -16,9 +16,10 @@ class Search:
         results = []
         for paper in client.results(search):
             processed = self._process_paper(paper)
-            logger.info(f"Found paper: {processed['title']}")
+            logger.info(f"Found paper: {processed['title']}, {processed['id']}")
             results.append(processed)
-            
+
+        return results
 
     def _process_paper(self, paper: arxiv.Result) -> Dict[str, Any]:
         """Process paper information with resource URI."""
@@ -32,3 +33,6 @@ class Search:
             "url": paper.pdf_url,
             "resource_uri": f"arxiv://{paper.get_short_id()}",
         }
+
+    def download(self, id_list: list):
+        pass

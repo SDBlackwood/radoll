@@ -43,7 +43,8 @@ sequenceDiagram
 
 - Create the scaffold of the Agent loop, stubbing out each of the components
 
-State Machine
+
+### State Machine
 The Agent works in a State Machine model in that we have States and Transition between states. 
 
 State -> Transition
@@ -51,4 +52,6 @@ State -> Transition
 - Resources Collected -> Evaluating -> Resources Evaluated
 - Resource Evaluated -> Storing Metadata -> Resources Metadata Stored
 - Resources Metadata Stored -> Parsing Resource -> Resource Parsed
+
+Searching: fetches potential papers from arxiv
 
